@@ -19,5 +19,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install Testmo CLI
+        run: npm install --global @testmo/testmo-cli
+
       - name: Run tests
         run: npm run mocha-junit
+
+      - name: Submit results to Testmo
+        if: always()
+        env:
+          TESTMO_URL: https://nafula.testmo.net
+          TESTMO_TOKEN: ${{ secrets.TESTMO_TOKEN }}
+        run: |
+          testmo automation:run:submit \
+            --instance "$TESTMO_URL" \
+            --project-id 1 \
+            --name "GitHub Actions practice run" \
+            --source "mocha-tests" \
+            --results results/mocha-test-results.xml
